@@ -30,80 +30,37 @@ if(HAVE_ATOMIC)
     add_definitions(-DHAVE_ATOMIC)
 endif()
 
-set(PlasMOUL_SOURCES
-    PlasMOUL/Key.cpp
-    PlasMOUL/Avatar/AnimStage.cpp
-    PlasMOUL/Avatar/ArmatureBrain.cpp
-    PlasMOUL/Avatar/AvBrainGeneric.cpp
-    PlasMOUL/Avatar/AvTask.cpp
-    PlasMOUL/Messages/EventData.cpp
-    PlasMOUL/Messages/Message.cpp
-    PlasMOUL/Messages/LoadCloneMsg.cpp
-    PlasMOUL/Messages/LoadAvatarMsg.cpp
-    PlasMOUL/Messages/AvatarInputStateMsg.cpp
-    PlasMOUL/Messages/ServerReplyMsg.cpp
-    PlasMOUL/Messages/NotifyMsg.cpp
-    PlasMOUL/Messages/InputIfaceMgrMsg.cpp
-    PlasMOUL/Messages/ClothingMsg.cpp
-    PlasMOUL/Messages/LinkEffectsTriggerMsg.cpp
-    PlasMOUL/Messages/KIMessage.cpp
-    PlasMOUL/Messages/AvatarMsg.cpp
-    PlasMOUL/Messages/AvTaskMsg.cpp
-    PlasMOUL/Messages/AvSeekMsg.cpp
-    PlasMOUL/Messages/EnableMsg.cpp
-    PlasMOUL/Messages/BulletMsg.cpp
-    PlasMOUL/Messages/SimulationMsg.cpp
-    PlasMOUL/Messages/MessageWithCallbacks.cpp
-    PlasMOUL/NetMessages/NetMessage.cpp
-    PlasMOUL/NetMessages/NetMsgObject.cpp
-    PlasMOUL/NetMessages/NetMsgGameMessage.cpp
-    PlasMOUL/NetMessages/NetMsgLoadClone.cpp
-    PlasMOUL/NetMessages/NetMsgPlayerPage.cpp
-    PlasMOUL/NetMessages/NetMsgMembersList.cpp
-    PlasMOUL/NetMessages/NetMsgRoomsList.cpp
-    PlasMOUL/NetMessages/NetMsgGameState.cpp
-    PlasMOUL/NetMessages/NetMsgSharedState.cpp
-    PlasMOUL/NetMessages/NetMsgSDLState.cpp
-    PlasMOUL/NetMessages/NetMsgGroupOwner.cpp
-    PlasMOUL/NetMessages/NetMsgRelevanceRegions.cpp
-    PlasMOUL/NetMessages/NetMsgVoice.cpp
-    PlasMOUL/factory.cpp
+set(dirtsand_MODULES
+    "PlasMOUL"
+    "SDL"
+    "Types"
+    "NetIO"
+    "GateKeeper"
+    "FileServ"
+    "AuthServ"
+    "GameServ"
 )
 
-set(SDL_SOURCES
-    SDL/SdlParser.cpp
-    SDL/DescriptorDb.cpp
-    SDL/StateInfo.cpp
+foreach(Module_Name ${dirtsand_MODULES})
+    file(GLOB_RECURSE ${Module_Name}_SOURCES ${Module_Name}/*.cpp)
+    file(GLOB_RECURSE ${Module_Name}_HEADERS ${Module_Name}/*.h)
+    source_group("${Module_Name}" FILES ${${Module_Name}_SOURCES} ${${Module_Name}_HEADERS})
+    list(APPEND all_SOURCES ${${Module_Name}_SOURCES} ${${Module_Name}_HEADERS})
+endforeach(Module_Name)
+
+file(GLOB dirtsand_HEADERS *.h)
+file(GLOB dirtsand_SOURCES *.cpp)
+
+set(dirtsand_TEXT
+    static_ages.ini
+    dirtsand.sample.ini
+    README
 )
 
-set(dirtsand_SOURCES
-    Types/UnifiedTime.cpp
-    Types/Uuid.cpp
-    Types/ShaHash.cpp
-    Types/BitVector.cpp
-    NetIO/MsgChannel.cpp
-    NetIO/SockIO.cpp
-    NetIO/CryptIO.cpp
-    NetIO/Lobby.cpp
-    NetIO/Status.cpp
-    GateKeeper/GateServ.cpp
-    FileServ/FileManifest.cpp
-    FileServ/FileServer.cpp
-    AuthServ/AuthManifest.cpp
-    AuthServ/AuthServer.cpp
-    AuthServ/AuthDaemon.cpp
-    AuthServ/AuthVault.cpp
-    AuthServ/VaultTypes.cpp
-    GameServ/GameServer.cpp
-    GameServ/GameHost.cpp
-    strings.cpp
-    streams.cpp
-    settings.cpp
-    encodings.cpp
-    dsmain.cpp
-)
+source_group("dirtsand" FILES ${dirtsand_SOURCES} ${dirtsand_HEADERS})
+source_group("Text Resources" FILES ${dirtsand_TEXT})
 
-add_executable(dirtsand ${dirtsand_SOURCES} ${SDL_SOURCES} ${PlasMOUL_SOURCES})
+add_executable(dirtsand ${all_SOURCES} ${dirtsand_SOURCES} ${dirtsand_HEADERS} ${dirtsand_TEXT})
 target_link_libraries(dirtsand ${CMAKE_THREAD_LIBS_INIT} ${POSTGRES_LIBRARY}
                                ${OPENSSL_CRYPTO_LIBRARIES} ${READLINE_LIBRARY}
                                ${ZLIB_LIBRARY})
